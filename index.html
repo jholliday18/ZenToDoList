@@ -68,10 +68,25 @@
 
 
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
+
+        import {
+            getFirestore,
+            collection,
+            doc,
+            addDoc,
+            updateDoc,
+            deleteDoc,
+            query,
+            onSnapshot,
+        } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
         // Firebase config
         const firebaseConfig = {
@@ -84,207 +99,229 @@
             measurementId: "G-0WCF5F1334"
         };
 
+
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // DOM elements
-        const form = document.getElementById('task-form');
-        const input = document.getElementById('task-input');
-        const columns = ['todo', 'doing', 'done'].map(id => document.getElementById(id));
-        const deleteArea = document.getElementById('delete-area');
+        const loginScreen = document.getElementById("login-screen");
+        const form = document.getElementById("add-task-form");
+        const input = document.getElementById("task-input");
 
-        let ghost = null;
-        let draggedText = null;
-        let activeDropZone = null;
-        let originalTask = null;
+        // The 3 task columns by id, e.g. 'todo', 'doing', 'done'
+        const columns = [
+            document.getElementById("todo"),
+            document.getElementById("doing"),
+            document.getElementById("done")
+        ];
 
-        // Hide delete area initially
-        deleteArea.style.display = "none";
+        // LOGIN HANDLERS
+        const loginForm = document.getElementById("login-form");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const signupButton = document.getElementById("signup-button");
+        const signinButton = document.getElementById("signin-button");
+        const logoutButton = document.getElementById("logout-button");
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            const text = input.value.trim();
-            if (!text) return;
-
-            const task = createTaskElement(text);
-            document.getElementById('todo').appendChild(task);
-            input.value = '';
+        // Signup user
+        signupButton.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert("User registered and logged in");
+            } catch (e) {
+                alert("Signup failed: " + e.message);
+            }
         });
 
-        function createTaskElement(text) {
-            const task = document.createElement('div');
-            task.className = "bg-white border border-gray-100 px-3 py-2 rounded shadow-sm cursor-grab hover:shadow-md transition-shadow";
+        // Signin user
+        signinButton.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                alert("Logged in successfully");
+            } catch (e) {
+                alert("Login failed: " + e.message);
+            }
+        });
+
+        // Logout
+        logoutButton.addEventListener("click", () => {
+            signOut(auth);
+        });
+
+        // CREATE TASK ELEMENT FUNCTION
+        function createTaskElement(text, taskId = null, column = "todo") {
+            const task = document.createElement("div");
+            task.className = "bg-white border border-gray-100 px-3 py-2 rounded shadow-sm cursor-grab hover:shadow-md transition-shadow relative";
             task.textContent = text;
             task.dataset.text = text;
+            task.dataset.taskId = taskId;
+            task.dataset.column = column;
 
-            task.setAttribute("draggable", true);
+            // Optional: Add pencil icon button for editing here if you want
 
-            task.addEventListener('dragstart', () => {
+            // Drag handlers - basic drag support
+            task.draggable = true;
+            task.addEventListener("dragstart", (e) => {
                 draggedText = text;
                 originalTask = task;
-                ghost = createGhost(text);
-                document.body.appendChild(ghost);
-                deleteArea.style.display = "flex";
+                e.dataTransfer.setData("text/plain", text);
+                e.dataTransfer.effectAllowed = "move";
+                setTimeout(() => task.classList.add("opacity-50"), 0);
             });
 
-            task.addEventListener('dragend', () => {
-                if (ghost) ghost.remove();
-                if (activeDropZone === deleteArea && draggedText) {
-                    originalTask.remove();
-                } else if (activeDropZone && draggedText) {
-                    animateTypingDrop(draggedText, activeDropZone);
-                    originalTask.remove();
-                }
+            task.addEventListener("dragend", () => {
                 draggedText = null;
                 originalTask = null;
-                activeDropZone = null;
-                deleteArea.style.display = "none";
-            });
-
-            // Touch events
-            task.addEventListener('touchstart', e => {
-                const touch = e.touches[0];
-                draggedText = text;
-                originalTask = task;
-                ghost = createGhost(text);
-                ghost.style.top = `${touch.clientY}px`;
-                ghost.style.left = `${touch.clientX}px`;
-                document.body.appendChild(ghost);
-                deleteArea.style.display = "flex";
-            });
-
-            task.addEventListener('touchmove', e => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                if (ghost) {
-                    ghost.style.top = `${touch.clientY}px`;
-                    ghost.style.left = `${touch.clientX}px`;
-                }
-                const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                activeDropZone = target?.closest('#todo, #doing, #done, #delete-area') || null;
-            });
-
-            task.addEventListener('touchend', () => {
-                if (ghost) ghost.remove();
-                if (activeDropZone === deleteArea && draggedText) {
-                    originalTask.remove();
-                } else if (activeDropZone && draggedText) {
-                    animateTypingDrop(draggedText, activeDropZone);
-                    originalTask.remove();
-                }
-                draggedText = null;
-                originalTask = null;
-                activeDropZone = null;
-                deleteArea.style.display = "none";
+                task.classList.remove("opacity-50");
             });
 
             return task;
         }
 
-        function createGhost(text) {
-            const el = document.createElement('div');
-            el.textContent = text;
-            el.className = "fixed px-3 py-2 rounded shadow-lg bg-white border border-gray-300 pointer-events-none opacity-90 text-sm";
-            el.style.zIndex = 1000;
-            el.style.transform = "translate(-50%, -50%)";
-            return el;
-        }
+        // VARIABLES FOR DRAGGING
+        let draggedText = null;
+        let originalTask = null;
+        let activeDropZone = null;
 
-        // Handle column drop detection
-        columns.forEach(col => {
-            col.addEventListener('dragover', e => {
+        // SETUP DROP ZONES (the columns)
+        columns.forEach((column) => {
+            column.addEventListener("dragover", (e) => {
                 e.preventDefault();
-                activeDropZone = col;
-                col.classList.add("drag-over");
+                activeDropZone = column;
+                column.classList.add("bg-gray-100");
             });
 
-            col.addEventListener('dragleave', () => {
-                col.classList.remove("drag-over");
+            column.addEventListener("dragleave", () => {
+                activeDropZone = null;
+                column.classList.remove("bg-gray-100");
             });
 
-            col.addEventListener('drop', e => {
+            column.addEventListener("drop", async (e) => {
                 e.preventDefault();
-                if (ghost) ghost.remove();
-                if (activeDropZone === deleteArea && draggedText) {
-                    originalTask.remove();
-                } else if (draggedText && activeDropZone) {
-                    animateTypingDrop(draggedText, activeDropZone);
+                column.classList.remove("bg-gray-100");
+
+                if (draggedText && activeDropZone && originalTask) {
+                    // Update Firestore with new column
+                    const taskId = originalTask.dataset.taskId;
+                    const user = auth.currentUser;
+                    if (user && taskId) {
+                        const taskDocRef = doc(db, "users", user.uid, "tasks", taskId);
+                        try {
+                            await updateDoc(taskDocRef, { column: activeDropZone.id });
+                        } catch (err) {
+                            console.error("Error updating task column:", err);
+                        }
+                    }
+
+                    // Remove old task element (it will be reloaded by onSnapshot)
                     originalTask.remove();
                 }
+
                 draggedText = null;
                 originalTask = null;
-                if (activeDropZone) activeDropZone.classList.remove("drag-over");
                 activeDropZone = null;
-                deleteArea.style.display = "none";
             });
         });
 
-        // Delete area listeners
-        deleteArea.addEventListener('dragover', e => {
+        // ADD TASK FORM SUBMIT
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please sign in first");
+                return;
+            }
+
+            try {
+                // Add to Firestore under user's tasks collection
+                const docRef = await addDoc(collection(db, "users", user.uid, "tasks"), {
+                    text: text,
+                    column: "todo",
+                    createdAt: Date.now(),
+                });
+
+                // Create and append task element locally (onSnapshot will sync anyway)
+                const task = createTaskElement(text, docRef.id, "todo");
+                document.getElementById("todo").appendChild(task);
+
+                input.value = "";
+            } catch (error) {
+                alert("Error saving task: " + error.message);
+            }
+        });
+
+        // AUTH STATE CHANGE - LOAD TASKS AND SHOW APP OR LOGIN
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginScreen.style.display = "none";
+                document.getElementById("app").style.display = "block";
+
+                // Listen for user's tasks live updates
+                const tasksQuery = query(collection(db, "users", user.uid, "tasks"));
+                onSnapshot(tasksQuery, (querySnapshot) => {
+                    // Clear columns on every update
+                    columns.forEach((col) => (col.innerHTML = ""));
+
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const task = createTaskElement(data.text, docSnap.id, data.column);
+                        const container = document.getElementById(data.column);
+                        if (container) container.appendChild(task);
+                    });
+                });
+            } else {
+                // Not logged in, show login screen
+                loginScreen.style.display = "flex";
+                document.getElementById("app").style.display = "none";
+
+                // Clear columns on logout
+                columns.forEach((col) => (col.innerHTML = ""));
+            }
+        });
+
+        // DELETE AREA
+        const deleteArea = document.getElementById("delete-area");
+        deleteArea.addEventListener("dragover", (e) => {
             e.preventDefault();
             activeDropZone = deleteArea;
-            deleteArea.classList.add('bg-red-100', 'text-red-700');
+            deleteArea.classList.add("bg-red-500", "text-white");
         });
-
-        deleteArea.addEventListener('dragleave', () => {
-            deleteArea.classList.remove('bg-red-100', 'text-red-700');
-            if (activeDropZone === deleteArea) activeDropZone = null;
-        });
-
-        deleteArea.addEventListener('drop', e => {
-            e.preventDefault();
-            if (ghost) ghost.remove();
-            if (draggedText && activeDropZone === deleteArea) {
-                originalTask.remove();
-            }
-            draggedText = null;
-            originalTask = null;
+        deleteArea.addEventListener("dragleave", () => {
             activeDropZone = null;
-            deleteArea.style.display = "none";
-            deleteArea.classList.remove('bg-red-100', 'text-red-700');
+            deleteArea.classList.remove("bg-red-500", "text-white");
         });
-
-        function animateTypingDrop(text, container) {
-            const task = document.createElement('div');
-            task.className = "bg-white border border-gray-200 px-3 py-2 rounded shadow-sm cursor-grab hover:shadow-md transition-shadow";
-            task.textContent = '';
-            container.appendChild(task);
-
-            let i = 0;
-            const interval = setInterval(() => {
-                task.textContent += text[i];
-                i++;
-                if (i >= text.length) {
-                    clearInterval(interval);
-                    const finalTask = createTaskElement(text);
-                    container.replaceChild(finalTask, task);
-                }
-            }, 30);
-        }
-
-        // Real Firebase Login
-        const loginScreen = document.getElementById("login-screen");
-        const loginForm = document.getElementById("login-form");
-
-        loginForm.addEventListener("submit", function (e) {
+        deleteArea.addEventListener("drop", async (e) => {
             e.preventDefault();
-            const email = loginForm.elements["email"].value;
-            const password = loginForm.elements["password"].value;
+            deleteArea.classList.remove("bg-red-500", "text-white");
 
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    loginScreen.classList.add("opacity-0");
-                    setTimeout(() => loginScreen.style.display = "none", 600);
-                    console.log("Logged in:", userCredential.user);
-                })
-                .catch((error) => {
-                    alert("Login failed: " + error.message);
-                    console.error(error);
-                });
+            if (activeDropZone === deleteArea && draggedText && originalTask) {
+                const taskId = originalTask.dataset.taskId;
+                const user = auth.currentUser;
+                if (user && taskId) {
+                    const taskDocRef = doc(db, "users", user.uid, "tasks", taskId);
+                    try {
+                        await deleteDoc(taskDocRef);
+                    } catch (err) {
+                        console.error("Error deleting task:", err);
+                    }
+                }
+                originalTask.remove();
+
+                draggedText = null;
+                originalTask = null;
+                activeDropZone = null;
+            }
         });
     </script>
+
 
 
 </body>
