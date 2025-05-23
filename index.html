@@ -78,6 +78,10 @@
             transition: stroke 0.3s ease;
         }
 
+        body.dark #logout-button svg {
+            stroke: #ffffff !important; /* pure white */
+        }
+
         body.dark #dark-mode-toggle svg {
             stroke: #ffffff; /* pure white */
         }
@@ -185,6 +189,12 @@
             position: relative;
         }
 
+        body.dark .task {
+            background-color: #3a3a3a !important; /* or another dark tone */
+            color: #ffffff !important;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.6);
+        }
+
         .typing-text {
             white-space: pre;
         }
@@ -249,7 +259,8 @@
             <input type="text"
                    id="task-input"
                    placeholder="Add a task..."
-                   class="pointer-events-auto w-3/4 max-w-md bg-white text-[#111827] placeholder-gray-400 px-5 py-3 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#a5b4fc] transition-all" />
+                   class="pointer-events-auto w-3/4 max-w-md bg-white text-[#111827] placeholder-gray-400 dark:placeholder-white px-5 py-3 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#a5b4fc] transition-all" />
+
         </form>
 
         <!-- Profile Button (bottom-left) -->
@@ -641,4 +652,5 @@ transition: transform 0.2s ease, box-shadow 0.2s ease;">
     </script>
 </body>
 </html>
+
 
