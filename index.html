@@ -193,6 +193,7 @@
             task.appendChild(content);
             typeText(content, text);
 
+            // --- Native drag events for desktop ---
             task.addEventListener("dragstart", (e) => {
                 draggedText = text;
                 originalTask = task;
@@ -209,51 +210,111 @@
                 deleteArea.style.display = "none";
                 activeDropZone = null;
             });
-            // --- Touch events ---
-            let ghost = null; // global scope
+
+            // --- Touch events for iPad and touch devices ---
+            let ghost = null;
+            let touchId = null;
+            let lastTarget = null;
+
             task.addEventListener('touchstart', e => {
+                if (e.touches.length !== 1) return; // Only single touch
+
                 const touch = e.touches[0];
+                touchId = touch.identifier;
+
                 draggedText = text;
                 originalTask = task;
 
                 ghost = createGhost(text);
+                ghost.style.position = 'fixed';
                 ghost.style.top = `${touch.clientY}px`;
                 ghost.style.left = `${touch.clientX}px`;
                 document.body.appendChild(ghost);
 
                 deleteArea.style.display = "flex";
+
+                e.preventDefault();
             });
 
             task.addEventListener('touchmove', e => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                if (ghost) {
-                    ghost.style.top = `${touch.clientY}px`;
-                    ghost.style.left = `${touch.clientX}px`;
+                const touch = Array.from(e.touches).find(t => t.identifier === touchId);
+                if (!touch || !ghost) return;
+
+                ghost.style.top = `${touch.clientY}px`;
+                ghost.style.left = `${touch.clientX}px`;
+
+                // Detect drop zone under finger
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                const dropZone = target?.closest('#todo, #doing, #done, #delete-area') || null;
+
+                if (lastTarget && lastTarget !== dropZone) {
+                    // Remove highlight from previous
+                    if (lastTarget !== deleteArea) lastTarget.classList.remove("bg-gray-100");
+                    else deleteArea.style.backgroundColor = "white";
+                }
+                if (dropZone && dropZone !== lastTarget) {
+                    // Add highlight to current
+                    if (dropZone !== deleteArea) dropZone.classList.add("bg-gray-100");
+                    else deleteArea.style.backgroundColor = "#fee2e2";
                 }
 
-                const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                activeDropZone = target?.closest('#todo, #doing, #done, #delete-area') || null;
+                activeDropZone = dropZone;
+                lastTarget = dropZone;
+
+                e.preventDefault();
             }, { passive: false });
 
-            task.addEventListener('touchend', () => {
-                if (ghost) ghost.remove();
+            task.addEventListener('touchend', e => {
+                if (ghost) {
+                    ghost.remove();
+                    ghost = null;
+                }
+
+                // Remove any highlights
+                if (lastTarget) {
+                    if (lastTarget !== deleteArea) lastTarget.classList.remove("bg-gray-100");
+                    else deleteArea.style.backgroundColor = "white";
+                }
 
                 if (activeDropZone === deleteArea && draggedText) {
+                    // Delete task
+                    if (originalTask.dataset.taskId) {
+                        deleteDoc(doc(db, "tasks", originalTask.dataset.taskId)).catch(console.error);
+                    }
                     originalTask.remove();
                 } else if (activeDropZone && draggedText) {
+                    // Move task to new column
+                    const newColId = activeDropZone.id;
+                    const taskId = originalTask.dataset.taskId;
+
+                    if (taskId) {
+                        updateDoc(doc(db, "tasks", taskId), { column: newColId }).catch(console.error);
+                    } else {
+                        addDoc(collection(db, "tasks"), {
+                            text: draggedText,
+                            column: newColId,
+                            userId: auth.currentUser.uid,
+                            createdAt: new Date(),
+                        }).catch(console.error);
+                    }
                     animateTypingDrop(draggedText, activeDropZone);
                     originalTask.remove();
                 }
+
                 draggedText = null;
                 originalTask = null;
                 activeDropZone = null;
+                lastTarget = null;
+                touchId = null;
 
                 deleteArea.style.display = "none";
+
+                e.preventDefault();
             });
 
             return task;
         }
+
 
         function createGhost(text) {
             const el = document.createElement('div');
