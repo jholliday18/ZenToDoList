@@ -19,6 +19,7 @@
             opacity: 0.5;
         }
         .task {
+            touch-action: none;
             background: white;
             padding: 0.5rem 0.75rem;
             margin: 0.25rem 0;
@@ -209,6 +210,7 @@
                 activeDropZone = null;
             });
             // --- Touch events ---
+            let ghost = null; // global scope
             task.addEventListener('touchstart', e => {
                 const touch = e.touches[0];
                 draggedText = text;
@@ -232,7 +234,7 @@
 
                 const target = document.elementFromPoint(touch.clientX, touch.clientY);
                 activeDropZone = target?.closest('#todo, #doing, #done, #delete-area') || null;
-            });
+            }, { passive: false });
 
             task.addEventListener('touchend', () => {
                 if (ghost) ghost.remove();
