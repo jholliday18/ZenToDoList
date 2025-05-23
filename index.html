@@ -57,9 +57,7 @@
                     class="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition">
                 Login
             </button>
-            <p class="text-xs text-center text-gray-500">
-                Use your Firebase test account
-            </p>
+            
         </form>
     </div>
 
@@ -96,37 +94,23 @@
                    placeholder="Add a task..."
                    class="pointer-events-auto w-3/4 max-w-md bg-white text-[#111827] placeholder-gray-400 px-5 py-3 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#a5b4fc] transition-all" />
         </form>
-
-        <!-- Logout Button -->
-        <button id="logout-button"
-                class="fixed top-6 right-6 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
-            Logout
-        </button>
+        
         <!-- Profile Button (bottom-left) -->
-        <button id="profile-button" title="Profile"
-                style="position: fixed; bottom: 6px; left: 6px; width: 48px; height: 48px; border-radius: 9999px;
-           background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-           cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 60;">
-            <!-- User icon SVG -->
-            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:24px; height:24px; stroke:#111827;">
-                <path d="M20 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M4 21v-2a4 4 0 0 1 3-3.87"></path>
-                <circle cx="12" cy="7" r="4"></circle>
+        <button id="logout-button" title="Logout"
+                style="position: fixed; bottom: 24px; left: 24px; width: 48px; height: 48px; border-radius: 9999px;
+    background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 60;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;">
+
+            <!-- Logout icon in gray-400 -->
+            <svg fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;">
+                <path d="M17 16l4-4m0 0l-4-4m4 4H7"></path>
+                <path d="M3 21V3"></path>
             </svg>
         </button>
 
-        <!-- Profile Page -->
-        <div id="profile-page" style="display:none; padding: 2rem; max-width: 600px; margin: 2rem auto;">
-            <button id="back-to-tasks" style="margin-bottom:1rem; padding:0.5rem 1rem; border-radius:0.5rem; background:#111827; color:#fff; cursor:pointer; border:none;">
-                ← Back to Tasks
-            </button>
-            <h2 style="font-size:1.5rem; margin-bottom:1rem;">Profile</h2>
-            <p><strong>Email:</strong> <span id="profile-email"></span></p>
-            <button id="logout-button" style="margin-top:1.5rem; background:#ef4444; color:#fff; padding:0.5rem 1rem; border:none; border-radius:0.375rem; cursor:pointer;">
-                Logout
-            </button>
-        </div>
+       
 
     </div>
     <script type="module">
@@ -224,8 +208,58 @@
                 deleteArea.style.display = "none";
                 activeDropZone = null;
             });
+            // --- Touch events ---
+            task.addEventListener('touchstart', e => {
+                const touch = e.touches[0];
+                draggedText = text;
+                originalTask = task;
+
+                ghost = createGhost(text);
+                ghost.style.top = `${touch.clientY}px`;
+                ghost.style.left = `${touch.clientX}px`;
+                document.body.appendChild(ghost);
+
+                deleteArea.style.display = "flex";
+            });
+
+            task.addEventListener('touchmove', e => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                if (ghost) {
+                    ghost.style.top = `${touch.clientY}px`;
+                    ghost.style.left = `${touch.clientX}px`;
+                }
+
+                const target = document.elementFromPoint(touch.clientX, touch.clientY);
+                activeDropZone = target?.closest('#todo, #doing, #done, #delete-area') || null;
+            });
+
+            task.addEventListener('touchend', () => {
+                if (ghost) ghost.remove();
+
+                if (activeDropZone === deleteArea && draggedText) {
+                    originalTask.remove();
+                } else if (activeDropZone && draggedText) {
+                    animateTypingDrop(draggedText, activeDropZone);
+                    originalTask.remove();
+                }
+                draggedText = null;
+                originalTask = null;
+                activeDropZone = null;
+
+                deleteArea.style.display = "none";
+            });
 
             return task;
+        }
+
+        function createGhost(text) {
+            const el = document.createElement('div');
+            el.textContent = text;
+            el.className = "fixed px-3 py-2 rounded shadow-lg bg-white border border-gray-300 pointer-events-none opacity-90 text-sm";
+            el.style.zIndex = 1000;
+            el.style.transform = "translate(-50%, -50%)";
+            return el;
         }
 
         function typeText(element, text, speed = 15) {
