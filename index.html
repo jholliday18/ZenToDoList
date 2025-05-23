@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>FlowTasks</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+          rel="stylesheet" />
     <style>
         body {
             background: #f8f9fa;
@@ -20,63 +21,109 @@
     </style>
 </head>
 <body class="bg-[#f9fafb] text-[#111827] font-sans">
-
-    <!-- Columns -->
-    <div class="flex flex-1 overflow-auto p-4 space-x-4 min-h-[calc(100vh-120px)]">
-        <div id="todo" class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
-            <h2 class="text-lg font-semibold mb-2">To Do</h2>
-        </div>
-        <div id="doing" class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
-            <h2 class="text-lg font-semibold mb-2">Doing</h2>
-        </div>
-        <div id="done" class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
-            <h2 class="text-lg font-semibold mb-2">Done</h2>
-        </div>
-    </div>
-
-    <!-- Delete Area (hidden on load, shown while dragging) -->
-    <div id="delete-area"
-         class="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-2xl font-bold text-red-500 select-none transition-colors"
-         style="display:none; cursor: pointer;">
-        ×
-    </div>
-
-    <!-- Input (Sticky Footer) -->
-    <form id="task-form" class="fixed bottom-6 w-full flex justify-center pointer-events-none">
-        <input type="text"
-               id="task-input"
-               placeholder="Add a task..."
-               class="pointer-events-auto w-3/4 max-w-md bg-white text-[#111827] placeholder-gray-400 px-5 py-3 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#a5b4fc] transition-all" />
-    </form>
-
     <!-- Login Screen -->
-    <div id="login-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center transition-opacity duration-500">
-        <form id="login-form" class="bg-white p-6 rounded-xl shadow-md w-80 space-y-4 border border-gray-200">
+    <div id="login-screen"
+         class="fixed inset-0 bg-white z-50 flex items-center justify-center transition-opacity duration-500">
+        <form id="login-form"
+              method="POST" action="#" class="bg-white p-6 rounded-xl shadow-md w-80 space-y-4 border border-gray-200">
             <h2 class="text-xl font-semibold text-gray-800 text-center">Sign in</h2>
-            <input type="email" name="email" placeholder="Email" required
+            <input id="email"
+                   type="email"
+                   name="email"
+                   placeholder="Email"
+                   required
                    class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black" />
-            <input type="password" name="password" placeholder="Password" required
+            <input id="password"
+                   type="password"
+                   name="password"
+                   placeholder="Password"
+                   required
                    class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black" />
             <button type="submit"
                     class="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition">
                 Login
             </button>
-            <p class="text-xs text-center text-gray-500">Use your Firebase test account</p>
+            <p class="text-xs text-center text-gray-500">
+                Use your Firebase test account
+            </p>
         </form>
     </div>
 
+    <!-- Main App Wrapper -->
+    <div id="app" style="display:none;">
+        <!-- Columns -->
+        <div class="flex flex-1 overflow-auto p-4 space-x-4 min-h-[calc(100vh-120px)]">
+            <div id="todo"
+                 class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
+                <h2 class="text-lg font-semibold mb-2">To Do</h2>
+            </div>
+            <div id="doing"
+                 class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
+                <h2 class="text-lg font-semibold mb-2">Doing</h2>
+            </div>
+            <div id="done"
+                 class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
+                <h2 class="text-lg font-semibold mb-2">Done</h2>
+            </div>
+        </div>
 
+        <!-- Delete Area (hidden on load, shown while dragging) -->
+        <div id="delete-area"
+             class="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center text-2xl font-bold text-red-500 select-none transition-colors"
+             style="display:none; cursor: pointer;">
+            ×
+        </div>
+
+        <!-- Input (Sticky Footer) -->
+        <form id="task-form"
+              class="fixed bottom-6 w-full flex justify-center pointer-events-none">
+            <input type="text"
+                   id="task-input"
+                   placeholder="Add a task..."
+                   class="pointer-events-auto w-3/4 max-w-md bg-white text-[#111827] placeholder-gray-400 px-5 py-3 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#a5b4fc] transition-all" />
+        </form>
+
+        <!-- Logout Button -->
+        <button id="logout-button"
+                class="fixed top-6 right-6 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">
+            Logout
+        </button>
+        <!-- Profile Button (bottom-left) -->
+        <button id="profile-button" title="Profile"
+                style="position: fixed; bottom: 6px; left: 6px; width: 48px; height: 48px; border-radius: 9999px;
+           background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+           cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 60;">
+            <!-- User icon SVG -->
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:24px; height:24px; stroke:#111827;">
+                <path d="M20 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M4 21v-2a4 4 0 0 1 3-3.87"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </button>
+
+        <!-- Profile Page -->
+        <div id="profile-page" style="display:none; padding: 2rem; max-width: 600px; margin: 2rem auto;">
+            <button id="back-to-tasks" style="margin-bottom:1rem; padding:0.5rem 1rem; border-radius:0.5rem; background:#111827; color:#fff; cursor:pointer; border:none;">
+                ← Back to Tasks
+            </button>
+            <h2 style="font-size:1.5rem; margin-bottom:1rem;">Profile</h2>
+            <p><strong>Email:</strong> <span id="profile-email"></span></p>
+            <button id="logout-button" style="margin-top:1.5rem; background:#ef4444; color:#fff; padding:0.5rem 1rem; border:none; border-radius:0.375rem; cursor:pointer;">
+                Logout
+            </button>
+        </div>
+
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
         import {
             getAuth,
-            createUserWithEmailAndPassword,
             signInWithEmailAndPassword,
             onAuthStateChanged,
             signOut,
         } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-auth.js";
-
         import {
             getFirestore,
             collection,
@@ -88,7 +135,6 @@
             onSnapshot,
         } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
 
-        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyB_WWeX2yqv6xdU85ijk1RcGVwl-N_jtPA",
             authDomain: "zentodolist-550d9.firebaseapp.com",
@@ -96,9 +142,8 @@
             storageBucket: "zentodolist-550d9.firebasestorage.app",
             messagingSenderId: "194938946751",
             appId: "1:194938946751:web:4013cdfa3455929953320a",
-            measurementId: "G-0WCF5F1334"
+            measurementId: "G-0WCF5F1334",
         };
-
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -106,65 +151,56 @@
         const db = getFirestore(app);
 
         const loginScreen = document.getElementById("login-screen");
-        const form = document.getElementById("add-task-form");
-        const input = document.getElementById("task-input");
-
-        // The 3 task columns by id, e.g. 'todo', 'doing', 'done'
-        const columns = [
-            document.getElementById("todo"),
-            document.getElementById("doing"),
-            document.getElementById("done")
-        ];
-
-        // LOGIN HANDLERS
         const loginForm = document.getElementById("login-form");
         const emailInput = document.getElementById("email");
         const passwordInput = document.getElementById("password");
-        const signupButton = document.getElementById("signup-button");
-        const signinButton = document.getElementById("signin-button");
-        const logoutButton = document.getElementById("logout-button");
 
-        // Signup user
-        signupButton.addEventListener("click", async () => {
+        const appDiv = document.getElementById("app");
+        const form = document.getElementById("task-form");
+        const input = document.getElementById("task-input");
+
+        const columns = [
+            document.getElementById("todo"),
+            document.getElementById("doing"),
+            document.getElementById("done"),
+        ];
+
+        const deleteArea = document.getElementById("delete-area");
+
+        // Login form submit
+        loginForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
             const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
-            try {
-                await createUserWithEmailAndPassword(auth, email, password);
-                alert("User registered and logged in");
-            } catch (e) {
-                alert("Signup failed: " + e.message);
-            }
-        });
 
-        // Signin user
-        signinButton.addEventListener("click", async () => {
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                alert("Logged in successfully");
-            } catch (e) {
-                alert("Login failed: " + e.message);
+                // Login successful: onAuthStateChanged will trigger
+            } catch (error) {
+                alert("Login failed: " + error.message);
             }
         });
 
-        // Logout
-        logoutButton.addEventListener("click", () => {
-            signOut(auth);
-        });
+        // Logout button
+        document
+            .getElementById("logout-button")
+            .addEventListener("click", () => signOut(auth));
 
-        // CREATE TASK ELEMENT FUNCTION
+        // Variables for dragging tasks
+        let draggedText = null;
+        let originalTask = null;
+        let activeDropZone = null;
+
+        // Create task element function
         function createTaskElement(text, taskId = null, column = "todo") {
             const task = document.createElement("div");
-            task.className = "bg-white border border-gray-100 px-3 py-2 rounded shadow-sm cursor-grab hover:shadow-md transition-shadow relative";
+            task.className =
+                "bg-white border border-gray-100 px-3 py-2 rounded shadow-sm cursor-grab hover:shadow-md transition-shadow relative";
             task.textContent = text;
             task.dataset.text = text;
             task.dataset.taskId = taskId;
             task.dataset.column = column;
 
-            // Optional: Add pencil icon button for editing here if you want
-
-            // Drag handlers - basic drag support
             task.draggable = true;
             task.addEventListener("dragstart", (e) => {
                 draggedText = text;
@@ -172,23 +208,23 @@
                 e.dataTransfer.setData("text/plain", text);
                 e.dataTransfer.effectAllowed = "move";
                 setTimeout(() => task.classList.add("opacity-50"), 0);
+                // Show delete area when dragging starts
+                deleteArea.style.display = "flex";
             });
 
             task.addEventListener("dragend", () => {
                 draggedText = null;
                 originalTask = null;
                 task.classList.remove("opacity-50");
+                // Hide delete area when dragging ends
+                deleteArea.style.display = "none";
+                activeDropZone = null;
             });
 
             return task;
         }
 
-        // VARIABLES FOR DRAGGING
-        let draggedText = null;
-        let originalTask = null;
-        let activeDropZone = null;
-
-        // SETUP DROP ZONES (the columns)
+        // Setup drop zones (columns)
         columns.forEach((column) => {
             column.addEventListener("dragover", (e) => {
                 e.preventDefault();
@@ -201,128 +237,246 @@
                 column.classList.remove("bg-gray-100");
             });
 
+            // Inside the drop listener in columns.forEach:
             column.addEventListener("drop", async (e) => {
                 e.preventDefault();
-                column.classList.remove("bg-gray-100");
+                if (!draggedText || !originalTask) return;
 
-                if (draggedText && activeDropZone && originalTask) {
-                    // Update Firestore with new column
-                    const taskId = originalTask.dataset.taskId;
-                    const user = auth.currentUser;
-                    if (user && taskId) {
-                        const taskDocRef = doc(db, "users", user.uid, "tasks", taskId);
-                        try {
-                            await updateDoc(taskDocRef, { column: activeDropZone.id });
-                        } catch (err) {
-                            console.error("Error updating task column:", err);
-                        }
+                const colId = column.id;
+                const taskId = originalTask.dataset.taskId;
+
+                try {
+                    // If task has a Firestore ID, update its column instead of adding a new one
+                    if (taskId) {
+                        await updateDoc(doc(db, "tasks", taskId), {
+                            column: colId
+                        });
+                    } else {
+                        // If for some reason there's no ID, fall back to adding new
+                        await addDoc(collection(db, "tasks"), {
+                            text: draggedText,
+                            column: colId,
+                            userId: auth.currentUser.uid,
+                            createdAt: new Date(),
+                        });
                     }
-
-                    // Remove old task element (it will be reloaded by onSnapshot)
-                    originalTask.remove();
+                } catch (error) {
+                    console.error("Error updating task:", error);
                 }
 
-                draggedText = null;
-                originalTask = null;
                 activeDropZone = null;
+                columns.forEach((col) => col.classList.remove("bg-gray-100"));
             });
+
         });
 
-        // ADD TASK FORM SUBMIT
+        // Delete area drop
+        deleteArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            deleteArea.style.backgroundColor = "#fee2e2";
+        });
+        deleteArea.addEventListener("dragleave", () => {
+            deleteArea.style.backgroundColor = "white";
+        });
+        deleteArea.addEventListener("drop", async (e) => {
+            e.preventDefault();
+            if (!originalTask) return;
+
+            // Remove task from Firestore if it has an ID
+            if (originalTask.dataset.taskId) {
+                try {
+                    await deleteDoc(doc(db, "tasks", originalTask.dataset.taskId));
+                } catch (error) {
+                    console.error("Error deleting task:", error);
+                }
+            }
+
+            // Remove task element from UI
+            originalTask.remove();
+
+            deleteArea.style.backgroundColor = "white";
+            deleteArea.style.display = "none";
+            draggedText = null;
+            originalTask = null;
+        });
+
+        // Add new task on submit
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             const text = input.value.trim();
             if (!text) return;
 
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Please sign in first");
-                return;
-            }
-
             try {
-                // Add to Firestore under user's tasks collection
-                const docRef = await addDoc(collection(db, "users", user.uid, "tasks"), {
-                    text: text,
+                // Save task to Firestore in "todo" column by default
+                await addDoc(collection(db, "tasks"), {
+                    text,
                     column: "todo",
-                    createdAt: Date.now(),
+                    userId: auth.currentUser.uid,
+                    createdAt: new Date(),
                 });
-
-                // Create and append task element locally (onSnapshot will sync anyway)
-                const task = createTaskElement(text, docRef.id, "todo");
-                document.getElementById("todo").appendChild(task);
-
                 input.value = "";
             } catch (error) {
-                alert("Error saving task: " + error.message);
+                console.error("Error adding task: ", error);
             }
         });
 
-        // AUTH STATE CHANGE - LOAD TASKS AND SHOW APP OR LOGIN
+        // Listen for auth state changes
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // Show app, hide login
                 loginScreen.style.display = "none";
-                document.getElementById("app").style.display = "block";
+                appDiv.style.display = "block";
 
-                // Listen for user's tasks live updates
-                const tasksQuery = query(collection(db, "users", user.uid, "tasks"));
-                onSnapshot(tasksQuery, (querySnapshot) => {
-                    // Clear columns on every update
-                    columns.forEach((col) => (col.innerHTML = ""));
+                // Subscribe to user's tasks
+                const q = query(
+                    collection(db, "tasks"),
+                    // only tasks of current user
+                    // you could add an index for better query performance
+                );
 
-                    querySnapshot.forEach((docSnap) => {
-                        const data = docSnap.data();
-                        const task = createTaskElement(data.text, docSnap.id, data.column);
-                        const container = document.getElementById(data.column);
-                        if (container) container.appendChild(task);
+                // Clear columns on each update
+                onSnapshot(q, (snapshot) => {
+                    columns.forEach((col) => {
+                        col.querySelectorAll("div").forEach((task) => {
+                            if (task !== col.querySelector("h2")) task.remove();
+                        });
+                    });
+
+                    snapshot.docs.forEach((docSnap) => {
+                        const taskData = docSnap.data();
+                        if (taskData.userId !== user.uid) return; // skip others' tasks
+                        const col = columns.find((c) => c.id === taskData.column);
+                        if (!col) return;
+                        const taskEl = createTaskElement(taskData.text, docSnap.id, taskData.column);
+                        col.appendChild(taskEl);
                     });
                 });
             } else {
-                // Not logged in, show login screen
+                // No user signed in: show login, hide app
                 loginScreen.style.display = "flex";
-                document.getElementById("app").style.display = "none";
-
-                // Clear columns on logout
-                columns.forEach((col) => (col.innerHTML = ""));
+                appDiv.style.display = "none";
             }
         });
+        // Add these variables for touch drag
+        let touchDraggedTask = null;
+        let touchOffsetX = 0;
+        let touchOffsetY = 0;
 
-        // DELETE AREA
-        const deleteArea = document.getElementById("delete-area");
-        deleteArea.addEventListener("dragover", (e) => {
+        // Helper: get element under touch
+        function getElementUnderTouch(touch) {
+            return document.elementFromPoint(touch.clientX, touch.clientY);
+        }
+
+        function onTouchStart(e) {
+            if (!e.target.classList.contains('cursor-grab')) return; // Only tasks
+
             e.preventDefault();
-            activeDropZone = deleteArea;
-            deleteArea.classList.add("bg-red-500", "text-white");
-        });
-        deleteArea.addEventListener("dragleave", () => {
-            activeDropZone = null;
-            deleteArea.classList.remove("bg-red-500", "text-white");
-        });
-        deleteArea.addEventListener("drop", async (e) => {
+            touchDraggedTask = e.target;
+            const touch = e.touches[0];
+
+            // Calculate offset between touch point and element top-left
+            const rect = touchDraggedTask.getBoundingClientRect();
+            touchOffsetX = touch.clientX - rect.left;
+            touchOffsetY = touch.clientY - rect.top;
+
+            // Style dragged task
+            touchDraggedTask.style.position = 'fixed';
+            touchDraggedTask.style.zIndex = 1000;
+            touchDraggedTask.style.pointerEvents = 'none';
+            touchDraggedTask.style.opacity = '0.5';
+
+            // Show delete area
+            deleteArea.style.display = 'flex';
+
+            // Move it immediately to touch position
+            moveTouchDraggedTask(touch);
+        }
+
+        function moveTouchDraggedTask(touch) {
+            if (!touchDraggedTask) return;
+            touchDraggedTask.style.left = (touch.clientX - touchOffsetX) + 'px';
+            touchDraggedTask.style.top = (touch.clientY - touchOffsetY) + 'px';
+        }
+
+        function onTouchMove(e) {
+            if (!touchDraggedTask) return;
             e.preventDefault();
-            deleteArea.classList.remove("bg-red-500", "text-white");
+            const touch = e.touches[0];
+            moveTouchDraggedTask(touch);
 
-            if (activeDropZone === deleteArea && draggedText && originalTask) {
-                const taskId = originalTask.dataset.taskId;
-                const user = auth.currentUser;
-                if (user && taskId) {
-                    const taskDocRef = doc(db, "users", user.uid, "tasks", taskId);
-                    try {
-                        await deleteDoc(taskDocRef);
-                    } catch (err) {
-                        console.error("Error deleting task:", err);
-                    }
-                }
-                originalTask.remove();
+            // Highlight drop zones under finger
+            const elem = getElementUnderTouch(touch);
 
-                draggedText = null;
-                originalTask = null;
+            // Remove all highlights
+            columns.forEach(c => c.classList.remove('bg-gray-100'));
+            deleteArea.style.backgroundColor = 'white';
+
+            if (!elem) return;
+
+            if (columns.some(col => col.contains(elem))) {
+                const col = columns.find(col => col.contains(elem));
+                col.classList.add('bg-gray-100');
+                activeDropZone = col;
+            } else if (deleteArea.contains(elem)) {
+                deleteArea.style.backgroundColor = '#fee2e2';
+                activeDropZone = deleteArea;
+            } else {
                 activeDropZone = null;
             }
-        });
+        }
+
+        async function onTouchEnd(e) {
+            if (!touchDraggedTask) return;
+            e.preventDefault();
+
+            // Remove dragging styles
+            touchDraggedTask.style.position = '';
+            touchDraggedTask.style.zIndex = '';
+            touchDraggedTask.style.pointerEvents = '';
+            touchDraggedTask.style.opacity = '';
+
+            // Hide delete area
+            deleteArea.style.display = 'none';
+            deleteArea.style.backgroundColor = 'white';
+
+            // If dropped on delete area, delete the task
+            if (activeDropZone === deleteArea) {
+                if (touchDraggedTask.dataset.taskId) {
+                    try {
+                        await deleteDoc(doc(db, "tasks", touchDraggedTask.dataset.taskId));
+                    } catch (error) {
+                        console.error("Error deleting task:", error);
+                    }
+                }
+                touchDraggedTask.remove();
+            }
+            // If dropped on column, update Firestore
+            else if (activeDropZone && columns.includes(activeDropZone)) {
+                const colId = activeDropZone.id;
+                const taskId = touchDraggedTask.dataset.taskId;
+                try {
+                    if (taskId) {
+                        await updateDoc(doc(db, "tasks", taskId), {
+                            column: colId
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error updating task:", error);
+                }
+            }
+
+            // Cleanup
+            activeDropZone = null;
+            touchDraggedTask = null;
+        }
+
+        // Attach touch event listeners to document (or better, container of tasks)
+        document.addEventListener('touchstart', onTouchStart, { passive: false });
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+        document.addEventListener('touchend', onTouchEnd);
+        document.addEventListener('touchcancel', onTouchEnd);
+     
     </script>
-
-
-
 </body>
 </html>
+
