@@ -7,9 +7,164 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
           rel="stylesheet" />
     <style>
+        /* Body base and dark mode background/text */
         body {
-            background: #f8f9fa;
+            background-color: #f9fafb;
+            color: #111827;
+            font-family: sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+
+            body.dark {
+                background-color: #121212 !important; /* very dark grey */
+                color: #ffffff !important; /* pure white */
+            }
+
+        /* Light mode background */
+        #todo, #doing, #done {
+            background-color: #ffffff; /* white */
+        }
+
+        /* Dark mode background */
+        body.dark #todo,
+        body.dark #doing,
+        body.dark #done {
+            background-color: #2e2e2e; /* tasteful dark grey */
+            color: white;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.7);
+        }
+
+        /* Buttons: Logout & Dark Mode Toggle */
+        #logout-button,
+        #dark-mode-toggle {
+            background-color: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+            color: inherit !important;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            width: 48px;
+            height: 48px;
+            position: fixed;
+            z-index: 60;
+            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        #logout-button {
+            bottom: 24px;
+            left: 24px;
+        }
+
+        #dark-mode-toggle {
+            bottom: 84px;
+            left: 24px;
+        }
+
+        /* Dark mode button and logout button styling */
+        body.dark #logout-button,
+        body.dark #dark-mode-toggle {
+            background-color: #3a3a3a !important; /* medium dark grey */
+            border-color: #555555 !important; /* medium grey */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
+            color: #ffffff !important; /* pure white */
+        }
+
+        /* Moon SVG stroke color in the toggle button */
+        #dark-mode-toggle svg {
+            stroke: #9ca3af; /* gray-400 */
+            transition: stroke 0.3s ease;
+        }
+
+        body.dark #dark-mode-toggle svg {
+            stroke: #ffffff; /* pure white */
+        }
+
+        /* Inputs and forms */
+        /* Task input styling */
+        #task-input {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 9999px;
+            padding: 0.75rem 1.25rem;
+            width: 75%;
+            max-width: 384px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark #task-input {
+            background-color: #3a3a3a !important; /* medium dark grey */
+            color: #ffffff !important; /* pure white */
+            border-color: #555555 !important;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.7);
+        }
+
+        /* Login form background and text */
+        #login-form {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark #login-form {
+            background-color: #222222 !important; /* darker grey for login background */
+            color: #ffffff !important; /* pure white */
+            border-color: #555555 !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+        }
+
+        /* Login inputs */
+        #login-form input {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            box-shadow: none;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark #login-form input {
+            background-color: #3a3a3a !important; /* medium grey */
+            color: #ffffff !important; /* pure white */
+            border-color: #555555 !important;
+            box-shadow: none;
+        }
+
+        /* Login button */
+        #login-form button {
+            background-color: #111827 !important; /* very dark grey */
+            color: #ffffff !important; /* pure white */
+            border-radius: 0.5rem;
+            padding: 0.5rem 0;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            #login-form button:hover {
+                background-color: #2e2e2e !important;
+            }
+
+        /* Headings */
+        h2 {
+            transition: color 0.3s ease;
+        }
+
+        body.dark h2 {
+            color: #ffffff !important; /* pure white */
+        }
+
 
         .drag-over {
             background-color: #f1f5f9 !important;
@@ -35,7 +190,7 @@
         }
     </style>
 </head>
-<body class="bg-[#f9fafb] text-[#111827] font-sans">
+<body class="bg-[#f9fafb] text-[#111827] font-sans dark:bg-[#111827] dark:text-[#f9fafb]">
     <!-- Login Screen -->
     <div id="login-screen"
          class="fixed inset-0 bg-white z-50 flex items-center justify-center transition-opacity duration-500">
@@ -58,7 +213,7 @@
                     class="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition">
                 Login
             </button>
-            
+
         </form>
     </div>
 
@@ -67,18 +222,19 @@
         <!-- Columns -->
         <div class="flex flex-1 overflow-auto p-4 space-x-4 min-h-[calc(100vh-120px)]">
             <div id="todo"
-                 class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
+                 class="flex-1 rounded-lg shadow-sm p-4 space-y-2 transition-colors bg-white dark:bg-gray-800 dark:text-white">
                 <h2 class="text-lg font-semibold mb-2">To Do</h2>
             </div>
             <div id="doing"
-                 class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
+                 class="flex-1 rounded-lg shadow-sm p-4 space-y-2 transition-colors bg-white dark:bg-gray-800 dark:text-white">
                 <h2 class="text-lg font-semibold mb-2">Doing</h2>
             </div>
             <div id="done"
-                 class="flex-1 bg-white rounded-lg shadow-sm p-4 space-y-2 transition">
+                 class="flex-1 rounded-lg shadow-sm p-4 space-y-2 transition-colors bg-white dark:bg-gray-800 dark:text-white">
                 <h2 class="text-lg font-semibold mb-2">Done</h2>
             </div>
         </div>
+
 
         <!-- Delete Area (hidden on load, shown while dragging) -->
         <div id="delete-area"
@@ -95,7 +251,7 @@
                    placeholder="Add a task..."
                    class="pointer-events-auto w-3/4 max-w-md bg-white text-[#111827] placeholder-gray-400 px-5 py-3 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#a5b4fc] transition-all" />
         </form>
-        
+
         <!-- Profile Button (bottom-left) -->
         <button id="logout-button" title="Logout"
                 style="position: fixed; bottom: 24px; left: 24px; width: 48px; height: 48px; border-radius: 9999px;
@@ -111,7 +267,21 @@
             </svg>
         </button>
 
-       
+        <!-- Dark mode toggle button -->
+        <button id="dark-mode-toggle" title="Toggle Dark Mode"
+                style="position: fixed; bottom: 84px; left: 24px; width: 48px; height: 48px; border-radius: 9999px;
+background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 60;
+transition: transform 0.2s ease, box-shadow 0.2s ease;">
+
+            <!-- Moon icon (gray-400 stroke) -->
+            <svg fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;">
+                <path d="M21 12.79A9 9 0 0112.21 3 7 7 0 1012 21a9 9 0 009-8.21z"></path>
+            </svg>
+        </button>
+
+
 
     </div>
     <script type="module">
@@ -302,14 +472,14 @@
                 }
 
 
-        
+
                 draggedText = null;
                 originalTask = null;
                 activeDropZone = null;
                 lastTarget = null;
                 touchId = null;
 
-                
+
 
                 e.preventDefault();
             });
@@ -450,6 +620,24 @@
                 appDiv.style.display = "none";
             }
         });
+
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+        darkModeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("theme", "dark");
+            } else {
+                localStorage.setItem("theme", "light");
+            }
+        });
+
+        // On load: apply saved mode
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.add("dark");
+        }
+
     </script>
 </body>
 </html>
