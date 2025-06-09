@@ -65,7 +65,8 @@
 
         /* Dark mode button and logout button styling */
         body.dark #logout-button,
-        body.dark #dark-mode-toggle {
+        body.dark #dark-mode-toggle,
+        body.dark #shared-tasks-toggle {
             background-color: #3a3a3a !important; /* medium dark grey */
             border-color: #555555 !important; /* medium grey */
             box-shadow: 0 2px 6px rgba(0,0,0,0.5) !important;
@@ -84,6 +85,10 @@
 
         body.dark #dark-mode-toggle svg {
             stroke: #ffffff; /* pure white */
+        }
+
+        body.dark #shared-tasks-toggle svg {
+            stroke: #ffffff !important; /* pure white */
         }
 
         /* Inputs and forms */
@@ -177,6 +182,7 @@
         .dragging {
             opacity: 0.5;
         }
+
         .task {
             touch-action: none;
             background: white;
@@ -198,6 +204,154 @@
         .typing-text {
             white-space: pre;
         }
+
+        /* 🌸 Base Pastel Mode */
+        body.pastel {
+            background-color: #fdfaf6;
+            color: #ffffff;
+            font-family: 'Nunito', sans-serif;
+        }
+
+            /* 🪩 Column Colors */
+            body.pastel #todo {
+                background-color: #ffcdd2; /* blush pink */
+            }
+
+            body.pastel #doing {
+                background-color: #b2ebf2; /* pastel aqua */
+            }
+
+            body.pastel #done {
+                background-color: #c8e6c9; /* mint green */
+            }
+
+            /* 🎨 Text Styling */
+            body.pastel h2,
+            body.pastel p,
+            body.pastel label,
+            body.pastel .task {
+                color: #ffffff !important;
+            }
+
+            /* 🔘 Toggle & Logout Buttons */
+            body.pastel #logout-button {
+                background-color: #ffcdd2 !important;
+                border: 0.5px solid white !important;
+                box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1) !important;
+                color: #ffcdd2 !important;
+                border-radius: 10px;
+            }
+
+                /* 🖼️ Toggle SVG Icon */
+                body.pastel #logout-button svg {
+                    stroke: white !important;
+                    fill: none !important;
+                }
+
+            body.pastel #dark-mode-toggle {
+                background-color: #b2ebf2 !important;
+                border: 0.5px solid white !important;
+                box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1) !important;
+                color: #b2ebf2 !important;
+                border-radius: 10px;
+            }
+
+                /* 🖼️ Toggle SVG Icon */
+                body.pastel #dark-mode-toggle svg {
+                    stroke: white !important;
+                    fill: none !important;
+                }
+
+            body.pastel #shared-tasks-toggle {
+                background-color: #c8e6c9 !important;
+                border: 0.5px solid white !important;
+                box-shadow: 0 2px 6px rgba(255, 255, 255, 0.1) !important;
+                color: #c8e6c9 !important;
+                border-radius: 10px;
+            }
+
+                /* 🖼️ Toggle SVG Icon */
+                body.pastel #shared-tasks-toggle svg {
+                    stroke: white !important;
+                    fill: none !important;
+                }
+
+        /* 📝 Input Box */
+        body.pastel #task-input {
+            background: #ffffff;
+            color: #000000 !important;
+            border: 2px solid #f48fb1;
+            padding: 10px 14px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
+            font-size: 16px;
+        }
+
+                /* Placeholder Text in Input */
+                body.pastel #task-input::placeholder {
+                    color: #444444;
+                }
+
+            /* 👤 Login Form Container */
+            body.pastel #login-form {
+                background-color: rgba(255, 255, 255, 0.2) !important;
+                border: 2px solid #f48fb1 !important;
+                color: black !important;
+                padding: 24px;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(244, 143, 177, 0.25);
+            }
+
+                /* 📥 Login Inputs */
+                body.pastel #login-form input {
+                    background-color: #ffffffcc !important;
+                    color: black !important;
+                    border: 1px solid #f48fb1 !important;
+                    padding: 10px;
+                    border-radius: 10px;
+                    margin-bottom: 12px;
+                    width: 100%;
+                    font-size: 16px;
+                }
+
+                    /* Placeholder inside login inputs */
+                    body.pastel #login-form input::placeholder {
+                        color: #555555;
+                    }
+
+                /* 🔓 Login Button */
+                body.pastel #login-form button {
+                    background-color: #f48fb1 !important;
+                    color: white !important;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 10px 16px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: background-color 0.2s ease;
+                }
+
+                    /* Hover for login button */
+                    body.pastel #login-form button:hover {
+                        background-color: #f06292 !important;
+                    }
+
+            /* 🧊 Tasks */
+            body.pastel .task {
+                background-color: #ffffff20;
+                color: #ffffff;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+            }
+
+                /* ✏️ Edit and other SVG icons inside tasks */
+                body.pastel .task svg {
+                    stroke: #000000 !important;
+                    fill: none !important;
+                }
+
+
+       
     </style>
 </head>
 <body class="bg-[#f9fafb] text-[#111827] font-sans dark:bg-[#111827] dark:text-[#f9fafb]">
@@ -291,6 +445,23 @@ transition: transform 0.2s ease, box-shadow 0.2s ease;">
                 <path d="M21 12.79A9 9 0 0112.21 3 7 7 0 1012 21a9 9 0 009-8.21z"></path>
             </svg>
         </button>
+
+        <!-- Shared Tasks Toggle Button -->
+        <button id="shared-tasks-toggle" title="Toggle Shared Tasks"
+                style="position: fixed; bottom: 144px; left: 24px; width: 48px; height: 48px; border-radius: 9999px;
+background-color: white; border: 1px solid #e5e7eb; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 60;
+transition: transform 0.2s ease, box-shadow 0.2s ease;">
+
+            <!-- Link/Chain Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#9ca3af" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"
+                 style="width: 24px; height: 24px;">
+                <path d="M10 13a5 5 0 007 0l2-2a5 5 0 00-7-7l-1 1" />
+                <path d="M14 11a5 5 0 00-7 0l-2 2a5 5 0 007 7l1-1" />
+            </svg>
+        </button>
+
 
 
 
@@ -632,22 +803,31 @@ transition: transform 0.2s ease, box-shadow 0.2s ease;">
             }
         });
 
-        const darkModeToggle = document.getElementById("dark-mode-toggle");
+        const themeToggle = document.getElementById("dark-mode-toggle");
 
-        darkModeToggle.addEventListener("click", () => {
-            document.body.classList.toggle("dark");
+        // Get the current theme from localStorage or default to light
+        let currentTheme = localStorage.getItem("theme") || "light";
+        applyTheme(currentTheme);
 
-            if (document.body.classList.contains("dark")) {
-                localStorage.setItem("theme", "dark");
+        themeToggle.addEventListener("click", () => {
+            // Cycle through the themes: light → dark → pastel → light
+            if (currentTheme === "light") {
+                currentTheme = "dark";
+            } else if (currentTheme === "dark") {
+                currentTheme = "pastel";
             } else {
-                localStorage.setItem("theme", "light");
+                currentTheme = "light";
             }
+
+            localStorage.setItem("theme", currentTheme);
+            applyTheme(currentTheme);
         });
 
-        // On load: apply saved mode
-        if (localStorage.getItem("theme") === "dark") {
-            document.body.classList.add("dark");
+        function applyTheme(theme) {
+            document.body.classList.remove("light", "dark", "pastel");
+            document.body.classList.add(theme);
         }
+
 
     </script>
 </body>
